@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{packed-model}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Doug Youch"]
-  s.date = %q{2013-05-02}
+  s.date = %q{2013-05-15}
   s.description = %q{Used to minimize storage space required to store list of data}
   s.email = %q{doug@sessionm.com}
   s.extra_rdoc_files = [
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     "lib/packed_model/base.rb",
     "lib/packed_model/errors.rb",
     "lib/packed_model/list.rb",
+    "packed-model.gemspec",
     "spec/helper.rb",
     "spec/packed_model/base_spec.rb",
     "spec/packed_model/list_spec.rb",
