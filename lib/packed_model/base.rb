@@ -44,7 +44,8 @@ module PackedModel
       case options[:type]
       when :string
         options[:strip] = true
-        options[:pack_directive] = 'Z*' # null terminated string
+        options[:null] = true
+        options[:pack_directive] = 'Z*'
       when :integer, :int
         options[:default] ||= 0 # pack 'N' directive requires a value for an integer
         options[:bytesize] = 4
@@ -58,11 +59,15 @@ module PackedModel
         options[:default] = options[:value]
         options[:bytesize] = 4
         options[:pack_directive] = 'N' # network byte order
+        options[:unpack_callback] ||= create_marker_unpack_callback(options[:index], options[:value])
       when :custom
         raise "missing pack_directive for #{name}" unless options[:pack_directive]
       else
         raise "Unknown type #{options[:type]}"
       end
+
+      add_unpack_callback(options[:unpack_callback]) if options[:unpack_callback].is_a?(Proc)
+      add_unpack_callback(create_strip_unpack_callback(options[:index], options[:null])) if options[:strip]
 
       class_eval do
         attrs = self.fields << options
@@ -212,21 +217,20 @@ module PackedModel
 
     def unpack(str)
       @values = str.unpack(self.class.pack_string)
-      self.fields.each do |field|
-        case field[:type]
-        when :string
-          if @values[field[:index]].empty?
-            @values[field[:index]] = nil
-          else
-            @values[field[:index]].strip!
-          end
-        when :char
-          @values[field[:index]].strip! if field[:strip]
-        when :marker
-          marker_value = @values[field[:index]]
-          raise BadMarkerException.new("unpack failed, invalid marker value (#{marker_value}) expected #{field[:value]}") unless marker_value == field[:value]
-        end
-      end
+      self.unpack_callbacks.each { |c| c.call self } if self.unpack_callbacks
+    end
+
+    def self.add_unpack_callback(callback)
+      @unpack_callbacks ||= []
+      @unpack_callbacks << callback
+    end
+
+    def self.unpack_callbacks
+      @unpack_callbacks
+    end
+
+    def unpack_callbacks
+      self.class.unpack_callbacks
     end
 
     private
@@ -241,6 +245,28 @@ module PackedModel
 
     def self.pack_string
       ""
+    end
+
+    def self.create_marker_unpack_callback(index, value)
+      Proc.new do |m|
+        raise BadMarkerException.new("unpack failed, invalid marker value (#{m.values[index]}) expected #{value}") unless m.values[index] == value
+      end
+    end
+
+    def self.create_strip_unpack_callback(index, null)
+      if null
+        Proc.new do |m|
+          if m.values[index].empty?
+            m.values[index] = nil
+          else
+            m.values[index].strip!
+          end
+        end
+      else
+        Proc.new do |m|
+          m.values[index].strip!
+        end
+      end
     end
   end
 end
