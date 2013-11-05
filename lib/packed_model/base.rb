@@ -165,7 +165,7 @@ module PackedModel
     def self.bit_vector(name, fields, options={})
       raise "too many fields for bit vecotr #{name}" if fields.size > 32
 
-      self.attribute name, {:type => :integer}.merge(options)
+      self.attribute name, {:type => :integer, :fields => fields}.merge(options)
 
       name_equals = "#{name}="
 
