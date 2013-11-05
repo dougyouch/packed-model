@@ -197,4 +197,75 @@ describe PackedModel::Base do
       m2.bytesize.should == 38
     end
   end
+
+  context "bit vector" do
+    class TestBitVectorPackedModel < PackedModel::Base
+      bit_vector :supports, [:bit1, :bit2, :bit3, :bit4, :bit5, :bit6, :bit7, :bit8,
+                             :bit9, :bit10, :bit11, :bit12, :bit13, :bit14, :bit15, :bit16,
+                             :bit17, :bit18, :bit19, :bit20, :bit21, :bit22, :bit23, :bit24,
+                             :bit25, :bit26, :bit27, :bit28, :bit29, :bit30, :bit31, :bit32]
+    end
+
+    it "should set all flags to false" do
+      m = TestBitVectorPackedModel.new
+      m.supports.should == 0
+      m.bit1.should be_false
+      m.bit8.should be_false
+      m.bit32.should be_false
+    end
+
+    it "should be able to set individual flags" do
+      m = TestBitVectorPackedModel.new
+      m.bit7.should be_false
+      m.bit7 = true
+      m.bit7.should be_true
+
+      m = TestBitVectorPackedModel.new m.pack
+      m.bit7.should be_true
+
+      m.supports.should == (1 << 6)
+    end
+
+    it "should be able to set and unset individual flags" do
+      m = TestBitVectorPackedModel.new
+      m.bit1 = true
+      m.bit7 = true
+      m.bit10 = true
+      m.bit17 = true
+      m.bit20 = true
+
+      m = TestBitVectorPackedModel.new m.pack
+      m.bit1.should be_true
+      m.bit7.should be_true
+      m.bit10.should be_true
+      m.bit17.should be_true
+      m.bit20.should be_true
+
+      m.bit2.should be_false
+      m.bit16.should be_false
+      m.bit18.should be_false
+      m.bit32.should be_false
+
+      m.bit10 = false
+      m.bit10.should be_false
+      m.bit32 = true
+      m.bit32.should be_true
+
+      m = TestBitVectorPackedModel.new m.pack
+      m.bit1.should be_true
+      m.bit7.should be_true
+      m.bit10.should be_false
+      m.bit17.should be_true
+      m.bit20.should be_true
+      m.bit32.should be_true
+    end
+
+    it "should default all flags to true" do
+      m = TestBitVectorPackedModel.new
+      m.supports = 0xFFFFFFFF
+      (1..32).each do |n|
+        m.send("bit#{n}").should be_true
+      end
+    end
+  end
 end

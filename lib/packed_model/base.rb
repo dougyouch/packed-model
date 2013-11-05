@@ -162,6 +162,30 @@ module PackedModel
       self.class_eval method_src, __FILE__, __LINE__
     end
 
+    def self.bit_vector(name, fields, options={})
+      raise "too many fields for bit vecotr #{name}" if fields.size > 32
+
+      self.attribute name, {:type => :integer}.merge(options)
+
+      name_equals = "#{name}="
+
+      fields.each_with_index do |fld, idx|
+        mask = 1 << idx
+
+        define_method fld do
+          (self.send(name) & mask) == mask
+        end
+
+        define_method "#{fld}=" do |val|
+          if val
+            self.send(name_equals, self.send(name) | mask)
+          else
+            self.send(name_equals, self.send(name) ^ mask)
+          end
+        end
+      end
+    end
+
     def initialize(values=nil)
       case values
       when String
