@@ -171,6 +171,7 @@ module PackedModel
 
       fields.each_with_index do |fld, idx|
         mask = 1 << idx
+        neg_mask = 0xFFFFFFFF ^ mask
 
         define_method fld do
           (self.send(name) & mask) == mask
@@ -180,7 +181,7 @@ module PackedModel
           if val
             self.send(name_equals, self.send(name) | mask)
           else
-            self.send(name_equals, self.send(name) ^ mask)
+            self.send(name_equals, self.send(name) & neg_mask)
           end
         end
       end

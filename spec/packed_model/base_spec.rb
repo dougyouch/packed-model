@@ -267,5 +267,12 @@ describe PackedModel::Base do
         m.send("bit#{n}").should be_true
       end
     end
+
+    it "should not break on ||= false" do
+      m = TestBitVectorPackedModel.new
+      m.bit1.should be_false
+      m.bit1 ||= false
+      m.bit1.should be_false
+    end
   end
 end
