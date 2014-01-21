@@ -162,6 +162,11 @@ module PackedModel
       self.class_eval method_src, __FILE__, __LINE__
     end
 
+    @@valid_true_boolean_values = nil
+    def self.valid_true_boolean_values
+      @@valid_true_boolean_values ||= [true, 1, '1', 'true', 'on', 'yes']
+    end
+
     def self.bit_vector(name, fields, options={})
       raise "too many fields for bit vecotr #{name}" if fields.size > 32
 
@@ -178,7 +183,7 @@ module PackedModel
         end
 
         define_method "#{fld}=" do |val|
-          if val
+          if self.class.valid_true_boolean_values.include?(val)
             self.send(name_equals, self.send(name) | mask)
           else
             self.send(name_equals, self.send(name) & neg_mask)
