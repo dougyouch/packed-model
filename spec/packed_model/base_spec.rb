@@ -274,5 +274,10 @@ describe PackedModel::Base do
       m.bit1 ||= false
       m.bit1.should be_false
     end
+ 
+    it "should be able to set bits from the initializer" do
+      m = TestBitVectorPackedModel.new :bit2 => true
+      m.bit2.should be_true
+    end
   end
 end

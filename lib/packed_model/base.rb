@@ -203,6 +203,12 @@ module PackedModel
         values.each do |k, v|
           send("#{k}=", v) if self.class.field_options(k)
         end
+        fields.each do |options|
+          next unless options[:fields]
+          options[:fields].each do |field|
+            send("#{field}=", values[field]) if values.has_key?(field)
+          end
+        end
         # set default values
         fields.each_with_index do |field, idx|
           @values[idx] ||= self.class.default_values[idx]
