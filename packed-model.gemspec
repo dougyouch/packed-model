@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "packed-model"
-  s.version = "0.1.4"
+  s.version = "0.1.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Doug Youch"]
-  s.date = "2013-11-05"
+  s.date = "2014-01-21"
   s.description = "Used to minimize storage space required to store list of data"
   s.email = "doug@sessionm.com"
   s.extra_rdoc_files = [
