@@ -229,10 +229,10 @@ describe PackedModel::Base do
     it "should be able to set and unset individual flags" do
       m = TestBitVectorPackedModel.new
       m.bit1 = true
-      m.bit7 = true
-      m.bit10 = true
-      m.bit17 = true
-      m.bit20 = true
+      m.bit7 = 1
+      m.bit10 = 'true'
+      m.bit17 = 'on'
+      m.bit20 = 'yes'
 
       m = TestBitVectorPackedModel.new m.pack
       m.bit1.should be_true
