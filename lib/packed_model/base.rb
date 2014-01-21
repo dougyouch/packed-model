@@ -127,7 +127,7 @@ module PackedModel
       when :integer, :int
         method_src << <<-METHOD
         def #{name}=(val)
-          val = val.nil? ? nil : val.to_i
+          val = val.to_i
           @changed = @changed || @values[#{options[:index]}] != val
           @values[#{options[:index]}] = val
         end
@@ -136,7 +136,7 @@ module PackedModel
         if options[:filter].is_a?(Symbol) || options[:filter].is_a?(String)
           method_src << <<-METHOD
           def #{name}=(val)
-            val = val.nil? ? nil : val.#{options[:filter]}
+            val = val.#{options[:filter]}
             @changed = @changed || @values[#{options[:index]}] != val
             @values[#{options[:index]}] = val
           end
@@ -144,7 +144,7 @@ module PackedModel
         elsif options[:filter] ||= block
           method_src << <<-METHOD
           def #{name}=(val)
-            val = val.nil? ? nil : self.class.field_options(#{name.inspect})[:filter].call(val)
+            val = self.class.field_options(#{name.inspect})[:filter].call(val)
             @changed = @changed || @values[#{options[:index]}] != val
             @values[#{options[:index]}] = val
           end
