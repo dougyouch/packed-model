@@ -280,4 +280,21 @@ describe PackedModel::Base do
       m.bit2.should be_true
     end
   end
+
+  context "nil value" do
+    class TestNilValuePackedModel < PackedModel::Base
+      attribute :count, :type => :integer
+      attribute :application_id, :type => :integer, :nil => 0
+    end
+
+    it "should return nil if the value of the integer equals the nil value" do
+      m = TestNilValuePackedModel.new
+      m.count.should == 0
+      m.application_id.should be_nil
+
+      m = TestNilValuePackedModel.new :count => 5, :application_id => 1
+      m.count.should == 5
+      m.application_id.should == 1
+    end
+  end
 end

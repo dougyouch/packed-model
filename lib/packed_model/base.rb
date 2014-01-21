@@ -115,6 +115,16 @@ module PackedModel
         end
         METHOD
 
+      if options.has_key?(:nil)
+        method_src << <<-METHOD
+          def #{name}_with_nil_check
+            #{name}_without_nil_check == #{options[:nil].inspect} ? nil : #{name}_without_nil_check
+          end
+         alias #{name}_without_nil_check #{name}
+         alias #{name} #{name}_with_nil_check
+         METHOD
+      end
+
       case options[:type]
       when :string, :char
         method_src << <<-METHOD
