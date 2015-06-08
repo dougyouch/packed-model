@@ -5,6 +5,7 @@ module PackedModel
     def initialize(row_class, values=nil)
       raise InvalidPackedModelException.new("row_class must be fixed width") unless row_class.fixed_width?
       @row_class = row_class
+      values.force_encoding(Encoding::BINARY) if values.respond_to?(:force_encoding)
       @buffer = values
     end
 
@@ -34,7 +35,7 @@ module PackedModel
     def pack
       return repack if @must_repack
       return @buffer unless @rows
-      @buffer ||= ''
+      @buffer ||= ''.force_encoding(Encoding::BINARY)
       start = 0
       @rows.each_with_index do |row, idx|
         # only updated dirty rows
@@ -49,7 +50,7 @@ module PackedModel
 
     # repacks the buffer
     def repack
-      @buffer = ''
+      @buffer = ''.force_encoding(Encoding::BINARY)
       self.each do |row|
         next unless row
         @buffer << row.pack
